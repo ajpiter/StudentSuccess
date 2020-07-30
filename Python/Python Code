@@ -60,59 +60,74 @@ df['GRADUATED_IN_4'].loc[df['GRADUATED_IN_4'] !=2]=0
 df['GRADUATED_IN_4'].loc[df['GRADUATED_IN_4'] ==2]=1
 
 
-Draw Correlation Maps:
-con = df[[
-"UF_CLASSNO",
-"RESIDENCYNO",
-"UF_CLASS_EOTNO",
-"JUNIOR_SENIOR_FLAGNO",
-"ENRL_CNT",
-"TOT_TAKEN_GPA",'LOW_TERM_GPA_IND','NOT_GRADUATED',
-'GRADUATED_IN_4']]
-corcon = con.corr(method='pearson')
-f, ax = plt.subplots(figsize=(15,15))
-sns.heatmap(corcon, vmax=.8, annot=True, square=True)
-plt.show()
 
-Draw Correlation Maps:
-con = df[[
-"UF_CLASSNO",
-"RESIDENCYNO",
-"UF_CLASS_EOTNO",
-"JUNIOR_SENIOR_FLAGNO",
+ 
+Draw the heatmap using seaborn
+ 
+Categorical variables：
+ 
+import seaborn as sns
+cat = df[["JUNIOR_SENIOR_FLAGNO",
 "ENRL_CNT",
-"TOT_TAKEN_GPA",'LOW_TERM_GPA_IND','NOT_GRADUATED',
-'GRADUATED_IN_4']]
-corcon = con.corr(method='pearson')
-f, ax = plt.subplots(figsize=(15,15))
-sns.heatmap(corcon, vmax=.8, annot=True, square=True)
-plt.show()
-
-Draw Correlation Maps:
-con = df[[
 "MAJORCOUNT",
-"WITHDRWL_TERM_IND",
+"UF_CLASSNO",
+"RESIDENCYNO",
+"TERM_END_DT_SID_CATGRYNO",
+"TERM_BEG_DT_CATGRYNO",
+"LOW_TERM_GPA_IND",
 "PARTTIME_TERM_IND",
-"TOT_TAKEN_GPA",'NOT_GRADUATED',
-'GRADUATED_IN_4']]
-corcon = con.corr(method='pearson')
+"NOT_REG_TERM_IND",
+"WITHDRWL_TERM_IND",
+"FULLTIME_TERM_IND",
+"OVR_12HR_TERM_IND"]]
+corcat = cat.corr(method='kendall')
+f, ax = plt.subplots(figsize=(15,15))
+sns.heatmap(corcat, vmax=.8, annot=True, square=True)
+plt.show()
+ 
+
+
+Correlation Matrix for Models
+
+Continuous variables：
+ 
+con = df[[
+"TERM_SID",
+"TERM_BEG_DT_SID",
+"TERM_END_DT_SID",
+"AGE_YEARS",
+"AGE_MONTHS",
+"AGE_DAYS",
+"TOT_TRNSFR",
+"TOT_TEST_CREDIT",
+"UNT_TAKEN_PRGRSS",
+"CUM_GPA",
+"TOT_TAKEN_GPA",
+“UNT_TAKEN_GPA”
+]]corcon = con.corr(method='pearson')
 f, ax = plt.subplots(figsize=(15,15))
 sns.heatmap(corcon, vmax=.8, annot=True, square=True)
 plt.show()
 
 
-Draw Correlation Maps:
+According to the plot above, we can delete the variable “TERM_END_DT_SID”, “TERM_SID” and “UNT_TAKEN_GPA”, and add “GRADUATED_WITHIN_4”.
+ 
+df.loc[df['STUDENT_SUCCESSNO'] !=1]=2
+df['GRADUATED_WITHIN_4']=df['STUDENT_SUCCESSNO']
+
 con = df[[
-"FULLTIME_TERM_IND",
-"WITHDRWL_TERM_IND",
-"PARTTIME_TERM_IND",
-    'RESIDENCYNO',
-"TOT_TAKEN_GPA",'NOT_GRADUATED',
-'GRADUATED_IN_4']]
-corcon = con.corr(method='pearson')
-f, ax = plt.subplots(figsize=(15,15))
-sns.heatmap(corcon, vmax=.8, annot=True, square=True)
-plt.show
+TERM_BEG_DT_SID
+"AGE_YEARS",
+"AGE_MONTHS",
+"AGE_DAYS",
+"TOT_TRNSFR",
+"TOT_TEST_CREDIT",
+"UNT_TAKEN_PRGRSS",
+"CUM_GPA",
+"TOT_TAKEN_GPA",
+“GRADUATED_WITHIN_4”
+]]
+
 
 
 
@@ -169,53 +184,29 @@ scores
  
  
 Cross Validation
+
 from sklearn.metrics import accuracy_score, recall_score, f1_score
 from sklearn.neighbors import KNeighborsClassifier as kNN
-
+ 
 model = kNN(n_neighbors = 3, algorithm='auto', weights='distance')
 Y = df['STUDENT_SUCCESSNO']
 X = df.drop(['STUDENT_SUCCESSNO'], axis= 1)
 scores = cross_val_score(model, X, Y, cv=5)
-scores
- 
+Scores
 
 Visualization
+ 
 fig = plt.figure(figsize=(20,10))
 plt.bar(df['STUDENT_SUCCESSNO'].value_counts().index, df['STUDENT_SUCCESSNO'].value_counts().values)
 plt.xticks(df['STUDENT_SUCCESSNO'].value_counts().index,fontsize=15)
-plt.show() 
-plt.scatter(X.values[:, 0], X.values[:, 1], c=Y)
 plt.show()
  
+plt.scatter(X.values[:, 0], X.values[:, 1], c=Y)
+plt.show(
 
 
 
 
-LIME
- 
-dfcolumn = df.columns.values.tolist()
-dfcolumn.remove('STUDENT_SUCCESSNO')
-dfcolumn.remove('TERM_END_DT_SID')
-dfcolumn.remove('TERM_SID')
-dfcolumn.remove('UNT_TAKEN_GPA')
- 
-import lime
-import lime.lime_tabular
-xtrainnp = np.array(x_train)
-ytrainnp = np.array(y_train)
- 
-explainer = lime.lime_tabular.LimeTabularExplainer(xtrainnp,
-                	feature_names=dfcolumn,
-                	class_names=['1','2','3'],
-                	verbose=True, mode='regression')
-choosen_instance = x_test.iloc[[200]].values[0]
-exp = explainer.explain_instance(choosen_instance, RF.predict, num_features=24)
-exp.show_in_notebook(show_all=False)
- 
- 
-choosen_instance = x_test.iloc[[3]].values[0]
-exp = explainer.explain_instance(choosen_instance, RF.predict, num_features=24)
-exp.show_in_notebook(show_all=False)
  
 One-hot encoding
  
@@ -260,24 +251,33 @@ y_pred = model.predict(x_test)
 from sklearn.metrics import classification_report, confusion_matrix
 print(classification_report(y_test, y_pred))
 
-xtrainnp = np.array(x_train)
-ytrainnp = np.array(y_train)
- 
-explainer = lime.lime_tabular.LimeTabularExplainer(xtrainnp,
-                	feature_names=dfcolumn,
-                	class_names=['1','2','3'],
-                	verbose=True, mode='regression')
-choosen_instance = x_test.iloc[[700]].values[0]
-exp = explainer.explain_instance(choosen_instance, model.predict,num_features=22)
-exp.show_in_notebook(show_all=False)
- 
- 
- 
- 
-choosen_instance = x_test.iloc[[98]].values[0]
-exp = explainer.explain_instance(choosen_instance, model.predict,num_features=22)
-exp.show_in_notebook(show_all=False)
- 
+Heatmap Comparing the Actual Target Values with Predict Target Values
+
+df2=pd.read_csv(“UF_R3_ANALYSIS_LASTMAJOR0714BE.csv")
+df2.dropna(axis=0, how='any',inplace=True)
+df2 = df2.loc[df2['STUDENT_SUCCESSNO'].isin(['1','2'])]
+Y2 = df2['STUDENT_SUCCESSNO']
+X2 = df2.drop(['TERM_END_DT_SID','TERM_SID','UNT_TAKEN_GPA'], axis= 1)
+x_train2, x_test2, y_train2, y_test2 = train_test_split(X2, Y2, test_size=0.2, random_state=3234)
+slen = len(x_test2['STUDENT_SUCCESSNO'])
+x_test2.loc[:,'Predict'] = pd.Series(np.random.randn(slen),index = x_test2.index)
+x_test2.loc[:,'Predict']=y_pred
+import seaborn as sns
+heat4 = x_test2[["TOT_TAKEN_GPA",
+"ENRL_CNT",
+"RESIDENCYNO",
+"PARTTIME_TERM_IND",
+"NOT_REG_TERM_IND",
+"WITHDRWL_TERM_IND",
+"FULLTIME_TERM_IND",
+"STUDENT_SUCCESSNO",
+"Predict"]]
+corcon4 = heat4.corr(method='kendall')
+f, ax = plt.subplots(figsize=(15,15))
+sns.heatmap(corcon4, vmax=.8, annot=True, square=True)
+plt.show()
+
+print(x_test2[["STUDENT_SUCCESSNO","Predict"]])
 
 
 
