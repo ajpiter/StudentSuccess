@@ -1,4 +1,6 @@
 
 
 
-7.2.20 UF_R1_SUCCESS_UNDERGRAND Counts on Outliers Report: Contains the outliers 
+7.2.20 UF_R1_SUCCESS_UNDERGRAND Counts on Outliers Report: Contains counts on outliers including 
+Current GPA, Date of Birth, Total Passed Progress in credit hours and Total Taken Progress in credit hours. 
+For more information on outliers please reference the Data Description Report. 
