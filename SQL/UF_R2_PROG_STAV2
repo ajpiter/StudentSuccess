@@ -1,0 +1,17 @@
+#Author @Dylan
+
+CREATE TABLE UF_R2_PROG_STAV2 AS(
+SELECT 
+A.PERSON_SID,
+A.ACAD_PLAN,
+(case when A.PROG_STATUS_SID = 4 then (1)
+else (0)
+end)AS "SUCCESS_GRADUATES",
+A.MAXEFF,
+A.MINEFF,
+(case when A.PROG_STATUS_SID = 4 AND (A.MAXEFF - A.MINEFF) >=39900 then ('5yrs')
+when A.PROG_STATUS_SID = 4 AND (A.MAXEFF - A.MINEFF <39900) then ('4yrs') 
+else ('no')
+end)AS "STUDENT_SUCCESS"
+FROM UF_R2_PROG_STA A 
+)
