@@ -4,4 +4,7 @@ Python or R(Create Visualizations & Build Model)
 Python Packages Utilized 
 Lime
 Pandas 
-SkikitLearn 
+Sklearn
+Numpy 
+MatPlotlib 
+Seaborn
