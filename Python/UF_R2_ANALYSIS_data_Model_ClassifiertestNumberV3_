@@ -1,0 +1,39 @@
+#Author @Bridge1998 
+
+import numpy as np
+import pandas as pd
+from sklearn import datasets,model_selection,linear_model,metrics
+df = pd.read_csv("UF_R2_ANALYSIS_datatestNumberV3.csv")
+from sklearn.model_selection import train_test_split
+Y = df['STUDENT_SUCCESSNO']
+X = df.drop(['STUDENT_SUCCESSNO'], axis= 1)
+x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=1234)
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn import metrics
+RF = RandomForestClassifier()
+RF = RF.fit(x_train, y_train)
+y_pred = RF.predict(x_test)
+
+from sklearn.neighbors import KNeighborsClassifier as kNN
+model = kNN(n_neighbors = 3, algorithm='auto', weights='distance')
+model.fit(x_train,y_train)
+y_pred = model.predict(x_test)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
