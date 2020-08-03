@@ -1,1 +1,3 @@
-
+Early on in the project we attempted to use SPSS to run statistical analysis on our dataset. 
+One table (out of many) from our data lake environment was 7M rows, and a 4GB TXT file. 
+Even with a direct connection Python proved to be a better tool when dealing with such a large dataset. 
